@@ -27,6 +27,14 @@ public class SelectSnowShovelingView extends VerticalLayout{
 
         this.snowService = snowService;
 
+        // Topページへ戻るボタン
+        Button backButton = new Button("戻る");
+        backButton.addClickListener(click -> {
+            getUI().ifPresent(ui -> ui.navigate(""));
+        });
+
+        add(backButton);
+
         //区のプロパティ
         Select<String> select = new Select<>();
         select.setLabel("区を選択してください");

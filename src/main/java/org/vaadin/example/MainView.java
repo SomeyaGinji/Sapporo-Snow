@@ -1,8 +1,12 @@
 package org.vaadin.example;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -39,9 +43,23 @@ public class MainView extends VerticalLayout {
 
     public MainView() {
 
-        // Use TextField for standard text input
-//        TextField textField = new TextField("Your name");
-//        textField.addClassName("bordered");
+        // Python側から送られるJSONデータ取得のための準備
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(apiUrl, String.class);
+
+        // JSONデータを処理
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response);
+
+            // "snowfall"キーの下の値を取得
+            String snowfall = jsonNode.get("snowfall").asText();
+            // ここで取得したデータを使用する処理を追加
+            add(new H1("明日の予測降雪量は"+snowfall+"cmです。"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Button click listeners can be defined as lambda expressions
         Button button = new Button("雪かきしてほしい！", e -> {
@@ -66,19 +84,6 @@ public class MainView extends VerticalLayout {
 
         add(button,button1);
 
-        Button button2 = new Button("Get Data from Python");
-        button2.addClickListener(event -> {
-            // RestTemplateを使用してPythonサーバーからデータを取得
-            RestTemplate restTemplate = new RestTemplate();
-            String response = restTemplate.getForObject(apiUrl, String.class);
-            Notification.show("Data from Python: " + response);
-        });
-
-        add(button2);
-
     }
 
-
-    public static class ShowSnowShovelingView {
-    }
 }
