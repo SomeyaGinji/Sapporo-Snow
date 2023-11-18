@@ -46,10 +46,25 @@ public class SnowRepository {
         String sql =
                 """
                 SELECT *
-                FROM shovelingplace;    
+                FROM shovelingplace
+                WHERE availability = true;    
                 """;
 
         return jdbcTemplate.query(sql, new DataClassRowMapper<>(ShovelingPlace.class));
+
+    }
+
+    // 雪かきを引き受けることでavailabilityをfalseにするメソッド（id列の値が必要）
+    public void updateAvailability(Long id){
+
+        String sql =
+                """
+                UPDATE shovelingplace
+                SET availability = false
+                WHERE id = ?;
+                """;
+
+        jdbcTemplate.update(sql, id);
 
     }
 
