@@ -14,6 +14,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.select.*;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.server.VaadinSession;
 import org.vaadin.example.data.ShovelingPlace;
 import org.vaadin.example.service.SnowService;
 
@@ -55,6 +56,9 @@ public class SelectSnowShovelingView extends VerticalLayout{
             shovelingPlace.setOthers(other.getValue());
             snowService.insertShovelingPlace(shovelingPlace); //DBに雪かき場所を登録
             System.out.println("DBに雪かき場所を追加完了");
+            // shovelingPlace をセッションに保存
+            VaadinSession.getCurrent().setAttribute("shovelingPlace", shovelingPlace);
+            getUI().ifPresent(ui -> ui.navigate("check-shoveling-place"));
         }
         );
 
