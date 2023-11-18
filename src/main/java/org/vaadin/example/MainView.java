@@ -44,8 +44,12 @@ public class MainView extends VerticalLayout {
 //        textField.addClassName("bordered");
 
         // Button click listeners can be defined as lambda expressions
-        Button button = new Button("雪かきしたい！", e -> {
+        Button button = new Button("雪かきしてほしい！", e -> {
             getUI().ifPresent(ui -> ui.navigate("select-snow-shoveling"));
+        });
+
+        Button button1 = new Button("雪かきしたい！", e -> {
+            getUI().ifPresent(ui -> ui.navigate("show-snow-shoveling"));
         });
 
         // Theme variants give you predefined extra styles for components.
@@ -60,7 +64,7 @@ public class MainView extends VerticalLayout {
         // styles.css.
         addClassName("centered-content");
 
-        add(button);
+        add(button,button1);
 
         Button button2 = new Button("Get Data from Python");
         button2.addClickListener(event -> {
@@ -75,4 +79,6 @@ public class MainView extends VerticalLayout {
     }
 
 
+    public static class ShowSnowShovelingView {
+    }
 }
