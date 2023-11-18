@@ -1,15 +1,13 @@
 package org.vaadin.example;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import org.springframework.web.client.RestTemplate;
+
 
 /**
  * A sample Vaadin view class.
@@ -23,6 +21,7 @@ import com.vaadin.flow.router.Route;
  * The main view contains a text field for getting the user name and a button
  * that shows a greeting message in a notification.
  */
+
 @Route
 public class MainView extends VerticalLayout {
 
@@ -35,15 +34,18 @@ public class MainView extends VerticalLayout {
      *            The message service. Automatically injected Spring managed
      *            bean.
      */
-    public MainView(@Autowired GreetService service) {
+
+    private final String apiUrl = "http://localhost:5000/api/data";  // PythonサーバーのAPIエンドポイントに合わせて変更してください
+
+    public MainView() {
 
         // Use TextField for standard text input
-        TextField textField = new TextField("Your name");
-        textField.addClassName("bordered");
+//        TextField textField = new TextField("Your name");
+//        textField.addClassName("bordered");
 
         // Button click listeners can be defined as lambda expressions
-        Button button = new Button("Say hello", e -> {
-            add(new Paragraph(service.greet(textField.getValue())));
+        Button button = new Button("雪かきしたい！", e -> {
+            getUI().ifPresent(ui -> ui.navigate("select-snow-shoveling"));
         });
 
         // Theme variants give you predefined extra styles for components.
@@ -58,7 +60,44 @@ public class MainView extends VerticalLayout {
         // styles.css.
         addClassName("centered-content");
 
-        add(textField, button);
+        add(button);
+
+        Button button2 = new Button("Get Data from Python");
+        button2.addClickListener(event -> {
+            // RestTemplateを使用してPythonサーバーからデータを取得
+            RestTemplate restTemplate = new RestTemplate();
+            String response = restTemplate.getForObject(apiUrl, String.class);
+            Notification.show("Data from Python: " + response);
+        });
+
+        add(button2);
+
+//        Button button3 = new Button("Get Current Location", event -> {
+//            // JavaScriptを呼び出して現在位置を取得
+//            getPage().executeJs("navigator.geolocation.getCurrentPosition("
+//                    + "function(position) {"
+//                    + "  var latitude = position.coords.latitude;"
+//                    + "  var longitude = position.coords.longitude;"
+//                    + "  $0.displayLocation(latitude, longitude);"
+//                    + "},"
+//                    + "function(error) {"
+//                    + "  $0.displayError(error.message);"
+//                    + "});", this);
+//        });
+//
+//        add(button3);
+
     }
+
+    // JavaScriptから呼び出されるメソッド: 位置情報を表示
+    public void displayLocation(double latitude, double longitude) {
+        Notification.show("Current Location: Latitude " + latitude + ", Longitude " + longitude);
+    }
+
+    // JavaScriptから呼び出されるメソッド: エラーメッセージを表示
+    public void displayError(String errorMessage) {
+        Notification.show("Error getting location: " + errorMessage);
+    }
+
 
 }
