@@ -18,7 +18,6 @@ import com.vaadin.flow.component.textfield.IntegerField;
 @Route(value = "select-snow-shoveling")
 public class SelectSnowShovelingView extends VerticalLayout{
 
-
     public SelectSnowShovelingView(){
         //区のプロパティ
         Select<String> select = new Select<>();
@@ -30,10 +29,17 @@ public class SelectSnowShovelingView extends VerticalLayout{
         TextField ward = new TextField();
         ward.setLabel("地名を入力してください");
 
+        TextField jou=CreateAddressField("条");
+        TextField chou=CreateAddressField("丁目");
+        TextField ban=CreateAddressField("番");
+        TextField gou=CreateAddressField("号");
+        TextField other=CreateAddressField("その他");
+
 
         Button addButton = new Button("決定");
         addButton.addClickListener(click -> {
             //決定ボタン処理
+                    System.out.println(jou.getValue());
         }
         );
 
@@ -44,12 +50,10 @@ public class SelectSnowShovelingView extends VerticalLayout{
                         select,
                         ward
                 ),
+
+
                 new HorizontalLayout(
-                        CreateAddressField("条"),
-                        CreateAddressField("丁目"),
-                        CreateAddressField("番"),
-                        CreateAddressField("号"),
-                        CreateAddressField("その他")
+                    jou,chou,ban,gou,other
                 ),
                 addButton
         );
