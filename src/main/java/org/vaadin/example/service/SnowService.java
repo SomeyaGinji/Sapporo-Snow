@@ -23,4 +23,6 @@ public class SnowService {
         return snowRepository.getShovelingPlaceList();
     }
 
+    public void updateAvailability(Long id){snowRepository.updateAvailability(id);}
+
 }
