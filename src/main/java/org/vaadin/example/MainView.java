@@ -72,31 +72,6 @@ public class MainView extends VerticalLayout {
 
         add(button2);
 
-//        Button button3 = new Button("Get Current Location", event -> {
-//            // JavaScriptを呼び出して現在位置を取得
-//            getPage().executeJs("navigator.geolocation.getCurrentPosition("
-//                    + "function(position) {"
-//                    + "  var latitude = position.coords.latitude;"
-//                    + "  var longitude = position.coords.longitude;"
-//                    + "  $0.displayLocation(latitude, longitude);"
-//                    + "},"
-//                    + "function(error) {"
-//                    + "  $0.displayError(error.message);"
-//                    + "});", this);
-//        });
-//
-//        add(button3);
-
-    }
-
-    // JavaScriptから呼び出されるメソッド: 位置情報を表示
-    public void displayLocation(double latitude, double longitude) {
-        Notification.show("Current Location: Latitude " + latitude + ", Longitude " + longitude);
-    }
-
-    // JavaScriptから呼び出されるメソッド: エラーメッセージを表示
-    public void displayError(String errorMessage) {
-        Notification.show("Error getting location: " + errorMessage);
     }
 
 
