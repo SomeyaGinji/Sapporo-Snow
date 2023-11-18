@@ -39,7 +39,7 @@ public class MainView extends VerticalLayout {
      *            bean.
      */
 
-    private final String apiUrl = "http://localhost:5000/api/data";  // PythonサーバーのAPIエンドポイントに合わせて変更してください
+    private final String apiUrl = "http://localhost:5000";  // PythonサーバーのAPIエンドポイントに合わせて変更してください
 
     public MainView() {
 
@@ -53,7 +53,7 @@ public class MainView extends VerticalLayout {
             JsonNode jsonNode = objectMapper.readTree(response);
 
             // "snowfall"キーの下の値を取得
-            String snowfall = jsonNode.get("snowfall").asText();
+            String snowfall = jsonNode.get("24時間降雪量 現在値(cm)").asText();
             // ここで取得したデータを使用する処理を追加
             add(new H1("明日の予測降雪量は"+snowfall+"cmです。"));
 
