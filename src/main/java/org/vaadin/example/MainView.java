@@ -22,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
  * that shows a greeting message in a notification.
  */
 
-@Route(value = "Top")
+@Route(value = "")
 public class MainView extends VerticalLayout {
 
     /**
