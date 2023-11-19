@@ -19,8 +19,8 @@ public class SnowService {
         snowRepository.insertShovelingPlace(shovelingPlace);
     }
 
-    public List<ShovelingPlace> getShovelingPlaceList(){
-        return snowRepository.getShovelingPlaceList();
+    public List<ShovelingPlace> getShovelingPlaceList(Long snowfall){
+        return snowRepository.getShovelingPlaceList(snowfall);
     }
 
     public void updateAvailability(Long id){snowRepository.updateAvailability(id);}

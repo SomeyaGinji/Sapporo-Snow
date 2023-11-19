@@ -42,16 +42,18 @@ public class SnowRepository {
     }
 
     // 雪かき場所一覧を取得するメソッド
-    public List<ShovelingPlace> getShovelingPlaceList(){
+    public List<ShovelingPlace> getShovelingPlaceList(Long snowfall){
 
         String sql =
                 """
                 SELECT *
                 FROM shovelingplace
-                WHERE availability = true;    
+                WHERE availability = true
+                AND snow < ? --雪かき希望量が予想降雪量より少ないものに絞る
+                ;    
                 """;
 
-        return jdbcTemplate.query(sql, new DataClassRowMapper<>(ShovelingPlace.class));
+        return jdbcTemplate.query(sql, new DataClassRowMapper<>(ShovelingPlace.class), snowfall);
 
     }
 
