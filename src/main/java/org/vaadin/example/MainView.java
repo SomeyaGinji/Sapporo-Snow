@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -56,6 +57,8 @@ public class MainView extends VerticalLayout {
             String snowfall = jsonNode.get("24時間降雪量 現在値(cm)").asText();
             // ここで取得したデータを使用する処理を追加
             add(new H1("明日の予測降雪量は"+snowfall+"cmです。"));
+            // 予想降雪量の値をセッションに保存
+            VaadinSession.getCurrent().setAttribute("snowfall", Double.parseDouble(snowfall));
 
         } catch (Exception e) {
             e.printStackTrace();
