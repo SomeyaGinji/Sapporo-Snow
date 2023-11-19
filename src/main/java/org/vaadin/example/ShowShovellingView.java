@@ -1,6 +1,10 @@
 package org.vaadin.example;
 
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -42,6 +46,34 @@ public class ShowShovellingView extends VerticalLayout {
         grid.addColumn(ShovelingPlace::getGou).setHeader("号");
         grid.addColumn(ShovelingPlace::getSnow).setHeader("希望除雪量");
         grid.addColumn(ShovelingPlace::getOthers).setHeader("その他");
+        List<ShovelingPlace> infomations = snowService.getShovelingPlaceList();
+        GridListDataView<ShovelingPlace> dataView=grid.setItems(infomations);
+
+        //検索フィールドのプロパティ
+        TextField searchField = new TextField();
+        searchField.setWidth("50%");
+        searchField.setPlaceholder("Search");
+        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchField.setValueChangeMode(ValueChangeMode.EAGER);
+        searchField.addValueChangeListener(e -> dataView.refreshAll());
+
+        dataView.addFilter(e -> {
+            String searchTerm = searchField.getValue().trim();
+
+            if (searchTerm.isEmpty())
+                return true;
+
+            boolean matchesWard = matchesTerm(e.getWard(), searchTerm);
+            boolean matchesTown = matchesTerm(e.getTown(), searchTerm);
+            boolean matchesJyo = matchesTerm(e.getJyo(), searchTerm);
+            boolean matchesTyo = matchesTerm(e.getTyo(), searchTerm);
+            boolean matchesBan = matchesTerm(e.getBan(), searchTerm);
+            boolean matchesGou =matchesTerm(e.getGou(),searchTerm);
+
+            return matchesWard || matchesTown || matchesJyo || matchesTyo || matchesBan || matchesGou;
+        });
+
+
         // 予想降雪量snowfallをセッションから取得
         Double snowfall = (Double) VaadinSession.getCurrent().getAttribute("snowfall");
         System.out.println("取得した降雪量："+snowfall);
@@ -64,12 +96,9 @@ public class ShowShovellingView extends VerticalLayout {
                 String msg = createDialogText(selected);
                 dialog.setHeader("確認画面");
                 dialog.setText(msg);
-
                 dialog.setCancelable(true);
                 dialog.setCancelText("戻る");
-
                 dialog.setConfirmText("決定");
-
                 dialog.open();
 
                 dialog.addConfirmListener(confirmEvent -> {
@@ -81,6 +110,7 @@ public class ShowShovellingView extends VerticalLayout {
 
         });
         add(    new H1("場所を選択"),
+                searchField,
                 grid,
                 addButton
         );
@@ -96,5 +126,13 @@ public class ShowShovellingView extends VerticalLayout {
         if(shovelingPlace.getOthers()!=null){msg=msg+shovelingPlace.getOthers();}
         if(shovelingPlace.getSnow()!=null){msg=msg+"\r\n希望除雪量:"+shovelingPlace.getSnow()+"cm";}
         return msg;
+    }
+    private boolean matchesTerm(String value, String searchTerm) {
+        try {
+            return value.toLowerCase().contains(searchTerm.toLowerCase());
+        }
+        catch (NullPointerException e){
+            return false;
+        }
     }
 }
