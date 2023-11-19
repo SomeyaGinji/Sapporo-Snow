@@ -3,6 +3,8 @@ package org.vaadin.example;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
@@ -79,9 +81,6 @@ public class ShowShovellingView extends VerticalLayout {
             return matchesWard || matchesTown || matchesJyo || matchesTyo || matchesBan || matchesGou;
         });
 
-
-
-
         addButton.addClickListener(click -> {
             //決定ボタン処理
             if (personSelect.isEmpty()) {
@@ -104,6 +103,9 @@ public class ShowShovellingView extends VerticalLayout {
 
                 dialog.addConfirmListener(confirmEvent -> {
                     snowService.updateAvailability(Id);
+                    // 緑色のスタイルでNotificationを追加
+                    Notification notification = Notification.show(msg + "の雪かきの依頼を受けました");
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     getUI().ifPresent(ui -> ui.navigate(""));
                 });
 
@@ -125,7 +127,7 @@ public class ShowShovellingView extends VerticalLayout {
         if(shovelingPlace.getBan()!=null){msg=msg+shovelingPlace.getBan()+"番";}
         if(shovelingPlace.getGou()!=null){msg=msg+shovelingPlace.getGou()+"号";}
         if(shovelingPlace.getOthers()!=null){msg=msg+shovelingPlace.getOthers();}
-        if(shovelingPlace.getSnow()!=null){msg=msg+"\r\n希望除雪量:"+shovelingPlace.getSnow()+"cm";}
+        if(shovelingPlace.getSnow()!=null){msg=msg+"\r\n希望除雪量(cm):"+shovelingPlace.getSnow()+"cm";}
         return msg;
     }
     private boolean matchesTerm(String value, String searchTerm) {
