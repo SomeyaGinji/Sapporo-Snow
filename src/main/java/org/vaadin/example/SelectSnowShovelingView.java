@@ -71,6 +71,7 @@ public class SelectSnowShovelingView extends VerticalLayout{
             shovelingPlace.setBan(ban.getValue());
             shovelingPlace.setGou(gou.getValue());
             shovelingPlace.setOthers(other.getValue());
+            shovelingPlace.setSnow(snow.getValue().longValue()); // Double型で取得されるみたいなのでLong型に変換
             snowService.insertShovelingPlace(shovelingPlace); //DBに雪かき場所を登録
             System.out.println("DBに雪かき場所を追加完了");
             // shovelingPlace をセッションに保存
