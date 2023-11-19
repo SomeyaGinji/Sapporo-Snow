@@ -11,6 +11,7 @@ public class ShovelingPlace {
     private String gou;
     private String others;
     private boolean availability;
+    private Long snow;
 
     public Long getId() {
         return id;
@@ -84,4 +85,11 @@ public class ShovelingPlace {
         this.availability = availability;
     }
 
+    public Long getSnow() {
+        return snow;
+    }
+
+    public void setSnow(Long snow) {
+        this.snow = snow;
+    }
 }

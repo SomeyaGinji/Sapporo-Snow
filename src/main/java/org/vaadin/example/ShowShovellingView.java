@@ -11,6 +11,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.component.grid.Grid.*;
+import com.vaadin.flow.server.VaadinSession;
 import org.vaadin.example.data.ShovelingPlace;
 import org.vaadin.example.repository.SnowRepository;
 import org.vaadin.example.service.SnowService;
@@ -43,13 +44,12 @@ public class ShowShovellingView extends VerticalLayout {
         grid.addColumn(ShovelingPlace::getTyo).setHeader("丁");
         grid.addColumn(ShovelingPlace::getBan).setHeader("番地");
         grid.addColumn(ShovelingPlace::getGou).setHeader("号");
-        //grid.addColumn(ShovelingPlace::getSnow).setHeader("希望除雪量");
+        grid.addColumn(ShovelingPlace::getSnow).setHeader("希望除雪量");
         grid.addColumn(ShovelingPlace::getOthers).setHeader("その他");
         List<ShovelingPlace> infomations = snowService.getShovelingPlaceList();
         GridListDataView<ShovelingPlace> dataView=grid.setItems(infomations);
 
         //検索フィールドのプロパティ
-
         TextField searchField = new TextField();
         searchField.setWidth("50%");
         searchField.setPlaceholder("Search");
@@ -74,27 +74,41 @@ public class ShowShovellingView extends VerticalLayout {
         });
 
 
+        // 予想降雪量snowfallをセッションから取得
+        Double snowfall = (Double) VaadinSession.getCurrent().getAttribute("snowfall");
+        System.out.println("取得した降雪量："+snowfall);
+        snowfall = 10.0; //テスト用
+        List<ShovelingPlace> infomations = snowService.getShovelingPlaceList(snowfall.longValue());
+        grid.setItems(infomations);
+
         addButton.addClickListener(click -> {
-                    //決定ボタン処理
-            if(personSelect.isEmpty()){
+            //決定ボタン処理
+            if (personSelect.isEmpty()) {
                 //未選択なら何もしない
-            }else {
-                ShovelingPlace selected=personSelect.getValue();
-                long Id=selected.getId();
+            } else {
+                ShovelingPlace selected = personSelect.getValue();
+                long Id = selected.getId();
+
+                // 選択された雪かき場所をセッションに保存
+                VaadinSession.getCurrent().setAttribute("selectedPlace", selected);
 
                 ConfirmDialog dialog = new ConfirmDialog();
-                String msg=createDialogText(selected);
+                String msg = createDialogText(selected);
                 dialog.setHeader("確認画面");
                 dialog.setText(msg);
                 dialog.setCancelable(true);
                 dialog.setCancelText("戻る");
                 dialog.setConfirmText("決定");
                 dialog.open();
-                dialog.addConfirmListener(confirmEvent -> snowService.updateAvailability(Id));
+
+                dialog.addConfirmListener(confirmEvent -> {
+                    snowService.updateAvailability(Id);
+                    getUI().ifPresent(ui -> ui.navigate(""));
+                });
 
             }
-                }
-        );
+
+        });
         add(    new H1("場所を選択"),
                 searchField,
                 grid,
@@ -103,14 +117,14 @@ public class ShowShovellingView extends VerticalLayout {
     }
     String createDialogText(ShovelingPlace shovelingPlace){
         String msg="";
-        msg=msg+shovelingPlace.getWard()+"区";
+        msg=msg+shovelingPlace.getWard();
         if(shovelingPlace.getTown()!=null){msg=msg+shovelingPlace.getTown();}
         if(shovelingPlace.getJyo()!=null){msg=msg+shovelingPlace.getJyo()+"条";}
         if(shovelingPlace.getTyo()!=null){msg=msg+shovelingPlace.getTyo()+"丁";}
         if(shovelingPlace.getBan()!=null){msg=msg+shovelingPlace.getBan()+"番";}
         if(shovelingPlace.getGou()!=null){msg=msg+shovelingPlace.getGou()+"号";}
         if(shovelingPlace.getOthers()!=null){msg=msg+shovelingPlace.getOthers();}
-        //if(shovelingPlace.getSnow()!=null){msg=msg+"\r\n希望除雪量:"+shovelingPlace.getSnow()+"cm"}
+        if(shovelingPlace.getSnow()!=null){msg=msg+"\r\n希望除雪量:"+shovelingPlace.getSnow()+"cm";}
         return msg;
     }
     private boolean matchesTerm(String value, String searchTerm) {
