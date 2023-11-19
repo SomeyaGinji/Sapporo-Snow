@@ -14,11 +14,27 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.select.*;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.server.VaadinSession;
+import org.vaadin.example.data.ShovelingPlace;
+import org.vaadin.example.service.SnowService;
 
 @Route(value = "select-snow-shoveling")
 public class SelectSnowShovelingView extends VerticalLayout{
 
-    public SelectSnowShovelingView(){
+    private SnowService snowService;
+
+    public SelectSnowShovelingView(SnowService snowService){
+
+        this.snowService = snowService;
+
+        // Topページへ戻るボタン
+        Button backButton = new Button("戻る");
+        backButton.addClickListener(click -> {
+            getUI().ifPresent(ui -> ui.navigate(""));
+        });
+
+        add(backButton);
+
         //区のプロパティ
         Select<String> select = new Select<>();
         select.setLabel("区を選択してください");
@@ -46,8 +62,20 @@ public class SelectSnowShovelingView extends VerticalLayout{
 
         Button addButton = new Button("決定");
         addButton.addClickListener(click -> {
-            //決定ボタン処理
-                    System.out.println(jou.getValue());
+            //決定ボタン押下時の処理
+            ShovelingPlace shovelingPlace = new ShovelingPlace();
+            shovelingPlace.setWard(select.getValue()); //区
+            shovelingPlace.setTown(ward.getValue()); //町（地名）
+            shovelingPlace.setJyo(jou.getValue());
+            shovelingPlace.setTyo(chou.getValue());
+            shovelingPlace.setBan(ban.getValue());
+            shovelingPlace.setGou(gou.getValue());
+            shovelingPlace.setOthers(other.getValue());
+            snowService.insertShovelingPlace(shovelingPlace); //DBに雪かき場所を登録
+            System.out.println("DBに雪かき場所を追加完了");
+            // shovelingPlace をセッションに保存
+            VaadinSession.getCurrent().setAttribute("shovelingPlace", shovelingPlace);
+            getUI().ifPresent(ui -> ui.navigate("check-shoveling-place"));
         }
         );
 

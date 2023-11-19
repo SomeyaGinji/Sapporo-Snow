@@ -1,11 +1,16 @@
 package org.vaadin.example;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -22,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
  * that shows a greeting message in a notification.
  */
 
-@Route
+@Route(value = "")
 public class MainView extends VerticalLayout {
 
     /**
@@ -35,13 +40,29 @@ public class MainView extends VerticalLayout {
      *            bean.
      */
 
-    private final String apiUrl = "http://localhost:5000/api/data";  // PythonサーバーのAPIエンドポイントに合わせて変更してください
+    private final String apiUrl = "http://localhost:5000";  // PythonサーバーのAPIエンドポイントに合わせて変更してください
 
     public MainView() {
 
-        // Use TextField for standard text input
-//        TextField textField = new TextField("Your name");
-//        textField.addClassName("bordered");
+        // Python側から送られるJSONデータ取得のための準備
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(apiUrl, String.class);
+
+        // JSONデータを処理
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response);
+
+            // "snowfall"キーの下の値を取得
+            String snowfall = jsonNode.get("24時間降雪量 現在値(cm)").asText();
+            // ここで取得したデータを使用する処理を追加
+            add(new H1("明日の予測降雪量は"+snowfall+"cmです。"));
+            // 予想降雪量の値をセッションに保存
+            VaadinSession.getCurrent().setAttribute("snowfall", Double.parseDouble(snowfall));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Button click listeners can be defined as lambda expressions
         Button button = new Button("雪かきしてほしい！", e -> {
@@ -66,19 +87,6 @@ public class MainView extends VerticalLayout {
 
         add(button,button1);
 
-        Button button2 = new Button("Get Data from Python");
-        button2.addClickListener(event -> {
-            // RestTemplateを使用してPythonサーバーからデータを取得
-            RestTemplate restTemplate = new RestTemplate();
-            String response = restTemplate.getForObject(apiUrl, String.class);
-            Notification.show("Data from Python: " + response);
-        });
-
-        add(button2);
-
     }
 
-
-    public static class ShowSnowShovelingView {
-    }
 }
