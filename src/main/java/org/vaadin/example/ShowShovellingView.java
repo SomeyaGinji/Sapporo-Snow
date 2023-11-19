@@ -39,7 +39,7 @@ public class ShowShovellingView extends VerticalLayout {
         grid.addColumn(ShovelingPlace::getTyo).setHeader("丁");
         grid.addColumn(ShovelingPlace::getBan).setHeader("番地");
         grid.addColumn(ShovelingPlace::getGou).setHeader("号");
-        //grid.addColumn(ShovelingPlace::getSnow).setHeader("希望除雪量");
+        grid.addColumn(ShovelingPlace::getSnow).setHeader("希望除雪量");
         grid.addColumn(ShovelingPlace::getOthers).setHeader("その他");
         List<ShovelingPlace> infomations = snowService.getShovelingPlaceList();
         grid.setItems(infomations);
@@ -83,7 +83,7 @@ public class ShowShovellingView extends VerticalLayout {
         if(shovelingPlace.getBan()!=null){msg=msg+shovelingPlace.getBan()+"番";}
         if(shovelingPlace.getGou()!=null){msg=msg+shovelingPlace.getGou()+"号";}
         if(shovelingPlace.getOthers()!=null){msg=msg+shovelingPlace.getOthers();}
-        //if(shovelingPlace.getSnow()!=null){msg=msg+"\r\n希望除雪量:"+shovelingPlace.getSnow()+"cm"}
+        if(shovelingPlace.getSnow()!=null){msg=msg+"\r\n希望除雪量:"+shovelingPlace.getSnow()+"cm";}
         return msg;
     }
 }

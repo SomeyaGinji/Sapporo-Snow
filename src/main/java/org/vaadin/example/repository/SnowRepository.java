@@ -25,8 +25,8 @@ public class SnowRepository {
         String sql =
                 """
                 INSERT INTO shovelingplace
-                (ward, town, jyo, tyo, ban, gou, others, availability)
-                VALUES(?, ?, ?, ?, ?, ?, ?, true);
+                (ward, town, jyo, tyo, ban, gou, others, availability, snow)
+                VALUES(?, ?, ?, ?, ?, ?, ?, true, ?);
                 """;
 
         jdbcTemplate.update(sql,
@@ -36,7 +36,8 @@ public class SnowRepository {
                 shovelingPlace.getTyo(),
                 shovelingPlace.getBan(),
                 shovelingPlace.getGou(),
-                shovelingPlace.getOthers());
+                shovelingPlace.getOthers(),
+                shovelingPlace.getSnow());
 
     }
 
