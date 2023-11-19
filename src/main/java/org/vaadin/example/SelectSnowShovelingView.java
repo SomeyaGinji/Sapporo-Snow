@@ -62,9 +62,6 @@ public class SelectSnowShovelingView extends VerticalLayout{
             shovelingPlace.setBan(ban.getValue());
             shovelingPlace.setGou(gou.getValue());
             shovelingPlace.setOthers(other.getValue());
-            // 予想降雪量snowfallをセッションから取得
-            Double snowfall = (Double) VaadinSession.getCurrent().getAttribute("snowfall");
-            System.out.println("取得した降雪量："+snowfall);
             snowService.insertShovelingPlace(shovelingPlace); //DBに雪かき場所を登録
             System.out.println("DBに雪かき場所を追加完了");
             // shovelingPlace をセッションに保存
