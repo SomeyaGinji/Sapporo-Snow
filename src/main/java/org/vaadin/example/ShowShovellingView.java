@@ -121,5 +121,4 @@ public class ShowShovellingView extends VerticalLayout {
             return false;
         }
     }
-
 }
