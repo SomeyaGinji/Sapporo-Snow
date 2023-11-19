@@ -50,15 +50,18 @@ public class ShowShovellingView extends VerticalLayout {
         grid.setItems(infomations);
 
         addButton.addClickListener(click -> {
-                    //決定ボタン処理
-            if(personSelect.isEmpty()){
+            //決定ボタン処理
+            if (personSelect.isEmpty()) {
                 //未選択なら何もしない
-            }else {
-                ShovelingPlace selected=personSelect.getValue();
-                long Id=selected.getId();
+            } else {
+                ShovelingPlace selected = personSelect.getValue();
+                long Id = selected.getId();
+
+                // 選択された雪かき場所をセッションに保存
+                VaadinSession.getCurrent().setAttribute("selectedPlace", selected);
 
                 ConfirmDialog dialog = new ConfirmDialog();
-                String msg=createDialogText(selected);
+                String msg = createDialogText(selected);
                 dialog.setHeader("確認画面");
                 dialog.setText(msg);
 
@@ -69,11 +72,14 @@ public class ShowShovellingView extends VerticalLayout {
 
                 dialog.open();
 
-                dialog.addConfirmListener(confirmEvent -> snowService.updateAvailability(Id));
+                dialog.addConfirmListener(confirmEvent -> {
+                    snowService.updateAvailability(Id);
+                    getUI().ifPresent(ui -> ui.navigate(""));
+                });
 
             }
-                }
-        );
+
+        });
         add(    new H1("場所を選択"),
                 grid,
                 addButton
@@ -81,7 +87,7 @@ public class ShowShovellingView extends VerticalLayout {
     }
     String createDialogText(ShovelingPlace shovelingPlace){
         String msg="";
-        msg=msg+shovelingPlace.getWard()+"区";
+        msg=msg+shovelingPlace.getWard();
         if(shovelingPlace.getTown()!=null){msg=msg+shovelingPlace.getTown();}
         if(shovelingPlace.getJyo()!=null){msg=msg+shovelingPlace.getJyo()+"条";}
         if(shovelingPlace.getTyo()!=null){msg=msg+shovelingPlace.getTyo()+"丁";}

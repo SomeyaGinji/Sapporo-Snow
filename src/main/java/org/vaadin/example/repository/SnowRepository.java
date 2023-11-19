@@ -49,7 +49,7 @@ public class SnowRepository {
                 SELECT *
                 FROM shovelingplace
                 WHERE availability = true
-                AND snow < ? --雪かき希望量が予想降雪量より少ないものに絞る
+                AND snow <= ? --雪かき希望量が予想降雪量より少ないものに絞る
                 ;    
                 """;
 
