@@ -46,7 +46,13 @@ public class ShowShovellingView extends VerticalLayout {
         grid.addColumn(ShovelingPlace::getGou).setHeader("号");
         grid.addColumn(ShovelingPlace::getSnow).setHeader("希望除雪量");
         grid.addColumn(ShovelingPlace::getOthers).setHeader("その他");
-        List<ShovelingPlace> infomations = snowService.getShovelingPlaceList();
+
+        // 予想降雪量snowfallをセッションから取得
+        Double snowfall = (Double) VaadinSession.getCurrent().getAttribute("snowfall");
+        System.out.println("取得した降雪量："+snowfall);
+        snowfall = 10.0; //テスト用
+        List<ShovelingPlace> infomations = snowService.getShovelingPlaceList(snowfall.longValue());
+        grid.setItems(infomations);
         GridListDataView<ShovelingPlace> dataView=grid.setItems(infomations);
 
         //検索フィールドのプロパティ
@@ -74,12 +80,7 @@ public class ShowShovellingView extends VerticalLayout {
         });
 
 
-        // 予想降雪量snowfallをセッションから取得
-        Double snowfall = (Double) VaadinSession.getCurrent().getAttribute("snowfall");
-        System.out.println("取得した降雪量："+snowfall);
-        snowfall = 10.0; //テスト用
-        List<ShovelingPlace> infomations = snowService.getShovelingPlaceList(snowfall.longValue());
-        grid.setItems(infomations);
+
 
         addButton.addClickListener(click -> {
             //決定ボタン処理
