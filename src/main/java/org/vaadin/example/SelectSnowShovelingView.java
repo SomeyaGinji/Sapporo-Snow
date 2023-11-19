@@ -35,6 +35,14 @@ public class SelectSnowShovelingView extends VerticalLayout{
         TextField gou=CreateAddressField("号");
         TextField other=CreateAddressField("その他");
 
+        //希望積雪量に関するプロパティ
+        NumberField snow=new NumberField();
+        Div unit = new Div();
+        snow.setStepButtonsVisible(true);
+        snow.setLabel("希望除雪量");
+        snow.setMin(0);
+        unit.setText("cm");
+        snow.setSuffixComponent(unit);
 
         Button addButton = new Button("決定");
         addButton.addClickListener(click -> {
@@ -50,11 +58,10 @@ public class SelectSnowShovelingView extends VerticalLayout{
                         select,
                         ward
                 ),
-
-
                 new HorizontalLayout(
                     jou,chou,ban,gou,other
                 ),
+                snow,
                 addButton
         );
     }
@@ -69,7 +76,6 @@ public class SelectSnowShovelingView extends VerticalLayout{
             textField.setSuffixComponent(div);
             textField.setWidth("15%");
         }
-
         return textField;
     }
 
