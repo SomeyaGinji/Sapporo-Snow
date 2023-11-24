@@ -1,12 +1,26 @@
 package org.vaadin.example;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
+import elemental.json.Json;
+import elemental.json.JsonObject;
 import org.springframework.web.client.RestTemplate;
+import org.vaadin.example.data.WardSnowfall;
+
+import java.util.List;
 
 
 /**
@@ -22,7 +36,7 @@ import org.springframework.web.client.RestTemplate;
  * that shows a greeting message in a notification.
  */
 
-@Route
+@Route(value = "")
 public class MainView extends VerticalLayout {
 
     /**
@@ -35,17 +49,67 @@ public class MainView extends VerticalLayout {
      *            bean.
      */
 
-    private final String apiUrl = "http://localhost:5000/api/data";  // PythonサーバーのAPIエンドポイントに合わせて変更してください
+    private final String apiUrl = "http://localhost:5000";  // PythonサーバーのAPIエンドポイントに合わせて変更してください
 
     public MainView() {
 
-        // Use TextField for standard text input
-//        TextField textField = new TextField("Your name");
-//        textField.addClassName("bordered");
+        add(new H3("明日の予測降雪量"));
+
+        // Python側から送られるJSONデータ取得のための準備
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(apiUrl, String.class);
+        System.out.println(response);
+
+        //List<WardSnowfall> wardSnowfalls = null;
+
+        // JSONデータを処理
+        try {
+            // JSONデータをパース
+            JsonObject jsonObject = Json.parse(response);
+
+            // 各地点の情報を取得
+            for (String key : jsonObject.keys()) {
+                String location = jsonObject.getObject(key).getString("地点");
+                Double snowfall = jsonObject.getObject(key).getNumber("24時間降雪量 現在値(cm)");
+
+                //WardSnowfall wardSnowfall = new WardSnowfall();
+                //wardSnowfall.setWard(location);
+                //wardSnowfall.setSnowfall(snowfall);
+                //wardSnowfalls.add(wardSnowfall);
+
+                // 取得した情報を表示
+                // Divコンポーネントを使用して段落ごとに要素を追加
+                Div div = new Div();
+                div.setText(location + ": " + snowfall + " cm");
+                add(div);
+            }
+
+            // 区名と予想降雪量の値をセッションに保存
+            //VaadinSession.getCurrent().setAttribute("wardsnowfall", wardSnowfalls);
+
+
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            JsonNode jsonNode = objectMapper.readTree(response);
+
+
+//            // "snowfall"キーの下の値を取得
+//            String snowfall = jsonNode.get("24時間降雪量 現在値(cm)").asText();
+//            // ここで取得したデータを使用する処理を追加
+//            add(new H1("明日の予測降雪量は"+snowfall+"cmです。"));
+//            // 予想降雪量の値をセッションに保存
+//            VaadinSession.getCurrent().setAttribute("snowfall", Double.parseDouble(snowfall));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Button click listeners can be defined as lambda expressions
-        Button button = new Button("雪かきしたい！", e -> {
+        Button button = new Button("雪かきしてほしい！", e -> {
             getUI().ifPresent(ui -> ui.navigate("select-snow-shoveling"));
+        });
+
+        Button button1 = new Button("雪かきしたい！", e -> {
+            getUI().ifPresent(ui -> ui.navigate("show-snow-shoveling"));
         });
 
         // Theme variants give you predefined extra styles for components.
@@ -60,44 +124,8 @@ public class MainView extends VerticalLayout {
         // styles.css.
         addClassName("centered-content");
 
-        add(button);
-
-        Button button2 = new Button("Get Data from Python");
-        button2.addClickListener(event -> {
-            // RestTemplateを使用してPythonサーバーからデータを取得
-            RestTemplate restTemplate = new RestTemplate();
-            String response = restTemplate.getForObject(apiUrl, String.class);
-            Notification.show("Data from Python: " + response);
-        });
-
-        add(button2);
-
-//        Button button3 = new Button("Get Current Location", event -> {
-//            // JavaScriptを呼び出して現在位置を取得
-//            getPage().executeJs("navigator.geolocation.getCurrentPosition("
-//                    + "function(position) {"
-//                    + "  var latitude = position.coords.latitude;"
-//                    + "  var longitude = position.coords.longitude;"
-//                    + "  $0.displayLocation(latitude, longitude);"
-//                    + "},"
-//                    + "function(error) {"
-//                    + "  $0.displayError(error.message);"
-//                    + "});", this);
-//        });
-//
-//        add(button3);
+        add(button,button1);
 
     }
-
-    // JavaScriptから呼び出されるメソッド: 位置情報を表示
-    public void displayLocation(double latitude, double longitude) {
-        Notification.show("Current Location: Latitude " + latitude + ", Longitude " + longitude);
-    }
-
-    // JavaScriptから呼び出されるメソッド: エラーメッセージを表示
-    public void displayError(String errorMessage) {
-        Notification.show("Error getting location: " + errorMessage);
-    }
-
 
 }
