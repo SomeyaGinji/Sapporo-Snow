@@ -3,6 +3,8 @@ package org.vaadin.example;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
@@ -13,6 +15,7 @@ import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.component.grid.Grid.*;
 import com.vaadin.flow.server.VaadinSession;
 import org.vaadin.example.data.ShovelingPlace;
+import org.vaadin.example.data.WardSnowfall;
 import org.vaadin.example.repository.SnowRepository;
 import org.vaadin.example.service.SnowService;
 import com.vaadin.flow.data.selection.MultiSelect;
@@ -44,13 +47,14 @@ public class ShowShovellingView extends VerticalLayout {
         grid.addColumn(ShovelingPlace::getTyo).setHeader("丁");
         grid.addColumn(ShovelingPlace::getBan).setHeader("番地");
         grid.addColumn(ShovelingPlace::getGou).setHeader("号");
-        grid.addColumn(ShovelingPlace::getSnow).setHeader("希望除雪量");
+        grid.addColumn(ShovelingPlace::getSnow).setHeader("希望除雪量(cm)");
         grid.addColumn(ShovelingPlace::getOthers).setHeader("その他");
 
         // 予想降雪量snowfallをセッションから取得
-        Double snowfall = (Double) VaadinSession.getCurrent().getAttribute("snowfall");
-        System.out.println("取得した降雪量："+snowfall);
-        snowfall = 10.0; //テスト用
+        //List<WardSnowfall> wardSnowfalls = (List<WardSnowfall>) VaadinSession.getCurrent().getAttribute("wardsnowfall");
+        Double snowfall; // = (Double) VaadinSession.getCurrent().getAttribute("snowfall");
+        //System.out.println("取得した降雪量："+snowfall);
+        snowfall = 100.0; //テスト用
         List<ShovelingPlace> infomations = snowService.getShovelingPlaceList(snowfall.longValue());
         grid.setItems(infomations);
         GridListDataView<ShovelingPlace> dataView=grid.setItems(infomations);
@@ -79,9 +83,6 @@ public class ShowShovellingView extends VerticalLayout {
             return matchesWard || matchesTown || matchesJyo || matchesTyo || matchesBan || matchesGou;
         });
 
-
-
-
         addButton.addClickListener(click -> {
             //決定ボタン処理
             if (personSelect.isEmpty()) {
@@ -104,6 +105,9 @@ public class ShowShovellingView extends VerticalLayout {
 
                 dialog.addConfirmListener(confirmEvent -> {
                     snowService.updateAvailability(Id);
+                    // 緑色のスタイルでNotificationを追加
+                    Notification notification = Notification.show(msg + "の雪かきの依頼を受けました");
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     getUI().ifPresent(ui -> ui.navigate(""));
                 });
 
